@@ -17,6 +17,7 @@ import logging
 from huggingface_hub import login
 import time
 import psutil
+from security import safe_command
 
 
 class Pipeline:
@@ -65,7 +66,7 @@ class Pipeline:
                 "--pattern",
                 self.valves.MLX_MODEL_FILTER,
             ]
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = safe_command.run(subprocess.run, cmd, capture_output=True, text=True)
             lines = result.stdout.strip().split("\n")
 
             content_lines = [
@@ -133,7 +134,7 @@ class Pipeline:
             command.append("--use-default-chat-template")
 
         logging.info(f"Starting MLX server with command: {' '.join(command)}")
-        self.server_process = subprocess.Popen(command)
+        self.server_process = safe_command.run(subprocess.Popen, command)
         self.current_model = model_id
         logging.info(f"Started MLX server for model {model_name} on port {self.port}")
         time.sleep(5)  # Give the server some time to start up
