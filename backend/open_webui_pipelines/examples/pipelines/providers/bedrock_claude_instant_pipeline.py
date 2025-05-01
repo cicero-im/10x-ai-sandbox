@@ -200,7 +200,7 @@ class Pipeline:
                 headers=headers,
                 auth=self.auth,
                 stream=True,
-            )
+            timeout=60)
             r.raise_for_status()
             if body.get("stream", False):
                 return self._parse_event_stream(r)

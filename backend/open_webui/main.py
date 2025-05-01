@@ -1210,7 +1210,7 @@ async def healthcheck():
     db_is_healthy = True
 
     # get pipelines health
-    response = requests.get("http://localhost:9099/models")
+    response = requests.get("http://localhost:9099/models", timeout=60)
     if response.status_code == 200:
         pipeline_is_healthy = True
 
@@ -1220,7 +1220,7 @@ async def healthcheck():
     redis_is_healthy = pong is True
 
     # get cohere proxy health
-    response = requests.get("http://localhost:9101/health")
+    response = requests.get("http://localhost:9101/health", timeout=60)
     if response.status_code == 200:
         cohere_is_healthy = True
 
