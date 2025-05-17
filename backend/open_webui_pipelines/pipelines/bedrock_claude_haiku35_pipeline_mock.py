@@ -7,9 +7,8 @@ from typing import Generator, Iterator, List, Optional, Union
 from pydantic import BaseModel
 from utils.pipelines.aws import bedrock_client
 from botocore.exceptions import BotoCoreError
-
-import random
 import re
+import secrets
 
 paterson = "I am load-testing bot, I only have one response. Please enjoy this poem by William Carlos Williams.\n\nPaterson lies in the valley under the Passaic Falls\nits spent waters forming the outline of his back. He\nlies on his right side, head near the thunder\nof the waters filling his dreams! Eternally asleep,\nhis dreams walk about the city where he persists\nincognito. Butterflies settle on his stone ear.\nImmortal he neither moves nor rouses and is seldom\nseen, though he breathes and the subtleties of his machinations\ndrawing their substance from the noise of the pouring river\nanimate a thousand automations. Who because they\nneither know their sources nor the sills of their\ndisappointments walk outside their bodies aimlessly\n    for the most part,\nlocked and forgot in their desires-unroused.\n\n  —Say it, no ideas but in things—\n  nothing but the blank faces of the houses\n  and cylindrical trees\n  bent, forked by preconception and accident—\n  split, furrowed, creased, mottled, stained—\n  secret—into the body of the light!\n\nFrom above, higher than the spires, higher\neven than the office towers, from oozy fields\nabandoned to gray beds of dead grass,\nblack sumac, withered weed-stalks,\nmud and thickets cluttered with dead leaves-\nthe river comes pouring in above the city\nand crashes from the edge of the gorge\nin a recoil of spray and rainbow mists-\n\n  (What common language to unravel?\n  . . .combed into straight lines\n  from that rafter of a rock's\n  lip.)\n\nA man like a city and a woman like a flower\n—who are in love. Two women. Three women.\nInnumerable women, each like a flower.\n\nBut\nonly one man—like a city.\n"  # noqa: E501
 
@@ -132,9 +131,9 @@ class Pipeline:
             index = 0
             delays = [1, 1, 1, 5, 5, 5, 25, 25, 75, 300]
             while index < len(words):
-                delay = random.choice(delays) / 1000
+                delay = secrets.choice(delays) / 1000
                 time.sleep(delay)
-                chunk_size = random.randint(1, 4)
+                chunk_size = secrets.SystemRandom().randint(1, 4)
                 chunk = " ".join(words[index : index + chunk_size])
                 yield chunk
                 index += chunk_size
