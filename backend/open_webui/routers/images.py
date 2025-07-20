@@ -26,6 +26,7 @@ from open_webui.utils.images.comfyui import (
     ComfyUIWorkflow,
     comfyui_generate_image,
 )
+from security import safe_requests
 
 
 log = logging.getLogger(__name__)
@@ -173,7 +174,7 @@ def get_automatic1111_api_auth(request: Request):
 async def verify_url(request: Request, user=Depends(get_admin_user)):
     if request.app.state.config.IMAGE_GENERATION_ENGINE == "automatic1111":
         try:
-            r = requests.get(
+            r = safe_requests.get(
                 url=f"{request.app.state.config.AUTOMATIC1111_BASE_URL}/sdapi/v1/options",
                 headers={"authorization": get_automatic1111_api_auth(request)},
             )
@@ -184,7 +185,7 @@ async def verify_url(request: Request, user=Depends(get_admin_user)):
             raise HTTPException(status_code=400, detail=ERROR_MESSAGES.INVALID_URL)
     elif request.app.state.config.IMAGE_GENERATION_ENGINE == "comfyui":
         try:
-            r = requests.get(
+            r = safe_requests.get(
                 url=f"{request.app.state.config.COMFYUI_BASE_URL}/object_info"
             )
             r.raise_for_status()
@@ -201,7 +202,7 @@ def set_image_model(request: Request, model: str):
     request.app.state.config.IMAGE_GENERATION_MODEL = model
     if request.app.state.config.IMAGE_GENERATION_ENGINE in ["", "automatic1111"]:
         api_auth = get_automatic1111_api_auth(request)
-        r = requests.get(
+        r = safe_requests.get(
             url=f"{request.app.state.config.AUTOMATIC1111_BASE_URL}/sdapi/v1/options",
             headers={"authorization": api_auth},
         )
@@ -234,7 +235,7 @@ def get_image_model(request):
         or request.app.state.config.IMAGE_GENERATION_ENGINE == ""
     ):
         try:
-            r = requests.get(
+            r = safe_requests.get(
                 url=f"{request.app.state.config.AUTOMATIC1111_BASE_URL}/sdapi/v1/options",
                 headers={"authorization": get_automatic1111_api_auth(request)},
             )
@@ -304,7 +305,7 @@ def get_models(request: Request, user=Depends(get_verified_user)):
             headers = {
                 "Authorization": f"Bearer {request.app.state.config.COMFYUI_API_KEY}"
             }
-            r = requests.get(
+            r = safe_requests.get(
                 url=f"{request.app.state.config.COMFYUI_BASE_URL}/object_info",
                 headers=headers,
             )
@@ -352,7 +353,7 @@ def get_models(request: Request, user=Depends(get_verified_user)):
             request.app.state.config.IMAGE_GENERATION_ENGINE == "automatic1111"
             or request.app.state.config.IMAGE_GENERATION_ENGINE == ""
         ):
-            r = requests.get(
+            r = safe_requests.get(
                 url=f"{request.app.state.config.AUTOMATIC1111_BASE_URL}/sdapi/v1/sd-models",
                 headers={"authorization": get_automatic1111_api_auth(request)},
             )
@@ -411,7 +412,7 @@ def save_b64_image(b64_str):
 def save_url_image(url):
     image_id = str(uuid.uuid4())
     try:
-        r = requests.get(url)
+        r = safe_requests.get(url)
         r.raise_for_status()
         if r.headers["content-type"].split("/")[0] == "image":
             mime_type = r.headers["content-type"]
