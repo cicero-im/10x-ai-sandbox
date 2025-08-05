@@ -127,7 +127,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
                     "Content-Type": "application/json",
                 },
                 stream=False,
-            )
+            timeout=60)
             r.raise_for_status()
 
             response = r.json()
