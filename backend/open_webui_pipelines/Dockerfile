@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm as base
+FROM python:3.14.2-slim-bookworm as base
 
 # Use args
 ARG USE_CUDA
